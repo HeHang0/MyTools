@@ -1,9 +1,5 @@
 ﻿using StringHelper;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Test
 {
@@ -12,8 +8,8 @@ namespace Test
         static void Main(string[] args)
         {
             string a = "abcsklajdlkabcaskjaklabc";
-            var b = RegexHelper.Matches(a, "abc");
-            Console.WriteLine(b.Count);
+            var b = RegexHelper.MatchesGroups(a, "a(b)(c)");
+            Console.WriteLine(b);
             Console.Read();
         }
     }
