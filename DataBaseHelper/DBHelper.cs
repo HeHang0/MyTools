@@ -10,11 +10,8 @@ namespace DataBaseHelper
 {
     public class DBHelper
     {
-        private string connectionString;
-        public DBHelper(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
+        protected string connectionString;
+        public DBHelper(string connectionString) => this.connectionString = connectionString;
 
         #region 【执行sql语句】
 
