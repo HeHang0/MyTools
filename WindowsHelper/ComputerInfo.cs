@@ -143,9 +143,11 @@ namespace WindowsHelper
         /// <returns>内存大小（单位M）</returns>
         private string GetPhisicalMemory()
         {
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher();   //用于查询一些如系统信息的管理对象 
-            searcher.Query = new SelectQuery(WindowsAPIType.Win32_PhysicalMemory.ToString(), "",
- new string[] { WindowsAPIKeys.Capacity.ToString() });//设置查询条件 
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher
+            {
+                Query = new SelectQuery(WindowsAPIType.Win32_PhysicalMemory.ToString(), "",
+ new string[] { WindowsAPIKeys.Capacity.ToString() })//设置查询条件 
+            };   //用于查询一些如系统信息的管理对象 
             ManagementObjectCollection collection = searcher.Get();   //获取内存容量 
             ManagementObjectCollection.ManagementObjectEnumerator em = collection.GetEnumerator();
 

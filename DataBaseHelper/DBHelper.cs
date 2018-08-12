@@ -209,8 +209,10 @@ namespace DataBaseHelper
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand();
-                command.Connection = conn;
+                SqlCommand command = new SqlCommand
+                {
+                    Connection = conn
+                };
                 SqlTransaction transaction = conn.BeginTransaction();
                 command.Transaction = transaction;
 

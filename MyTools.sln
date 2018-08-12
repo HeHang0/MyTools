@@ -25,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows类", "Windows类", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsHelper", "WindowsHelper\WindowsHelper.csproj", "{836B44FA-00AD-4D0E-9504-39D5D60495FB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web类", "Web类", "{5C5802C2-658B-4950-8CB6-E86C5ACFA2EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreWebDemo", "CoreWebDemo\CoreWebDemo.csproj", "{92655F23-C6BB-4D9D-870D-22A254F9DDD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,10 @@ Global
 		{836B44FA-00AD-4D0E-9504-39D5D60495FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{836B44FA-00AD-4D0E-9504-39D5D60495FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{836B44FA-00AD-4D0E-9504-39D5D60495FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92655F23-C6BB-4D9D-870D-22A254F9DDD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92655F23-C6BB-4D9D-870D-22A254F9DDD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92655F23-C6BB-4D9D-870D-22A254F9DDD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92655F23-C6BB-4D9D-870D-22A254F9DDD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +73,7 @@ Global
 		{EB08B965-4B8E-46B7-8A7B-41248E9EEEDB} = {FD37C3E6-38B6-40B1-86CF-0F88AEACC2AC}
 		{6C9FF5EE-92CD-4F43-BE0E-509F9DB599E4} = {A2F777AE-8003-443B-8EDE-96EFCAE53A56}
 		{836B44FA-00AD-4D0E-9504-39D5D60495FB} = {DCB28F64-9016-48F8-87D9-776ADD5A0020}
+		{92655F23-C6BB-4D9D-870D-22A254F9DDD8} = {5C5802C2-658B-4950-8CB6-E86C5ACFA2EF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35C72479-B027-43E8-9596-C37BE3F78C3F}

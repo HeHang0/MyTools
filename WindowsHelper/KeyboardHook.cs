@@ -109,9 +109,8 @@ namespace WindowsHelper
 
                 if (_clientMethod != null)
                 {
-                    bool handle = false;
                     //调用客户提供的事件处理程序。
-                    _clientMethod(hookStruct, out handle);
+                    _clientMethod(hookStruct, out bool handle);
                     if (handle) return 1; //1:表示拦截键盘,return 退出
                 }
             }
