@@ -14,21 +14,23 @@ namespace WindowsHelper
     {
         private static ComputerInfo instance;
         private static readonly object _lock = new object();
-        private ComputerInfo()
-        { }
-        public static ComputerInfo CreateComputer()
+        private ComputerInfo(){ }
+        public static ComputerInfo CreateComputer
         {
-            if (instance == null)
+            get
             {
-                lock (_lock)
+                if (instance == null)
                 {
-                    if (instance == null)
+                    lock (_lock)
                     {
-                        instance = new ComputerInfo();
+                        if (instance == null)
+                        {
+                            instance = new ComputerInfo();
+                        }
                     }
                 }
+                return instance;
             }
-            return instance;
         }
 
         #region 【计算机属性】
@@ -365,7 +367,7 @@ m[WindowsAPIKeys.ScreenHeight.ToString()].ToString();
     /// <summary>
     /// windows api 名称
     /// </summary>
-    public enum WindowsAPIType
+    enum WindowsAPIType
     {
         /// <summary>
         /// 内存
@@ -400,7 +402,7 @@ m[WindowsAPIKeys.ScreenHeight.ToString()].ToString();
     #endregion
 
     #region 【WindowsAPI属性】
-    public enum WindowsAPIKeys
+    enum WindowsAPIKeys
     {
         /// <summary>
         /// 名称
