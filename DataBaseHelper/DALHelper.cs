@@ -27,7 +27,7 @@ namespace DataBaseHelper
 
             string cols = $"({string.Join(", ", paramsDic.Select(m => m.Key))})";
             string value = string.Join(", ", paramsDic.Select(m => $"@{m.Key}"));
-            string sql = $"INSERT INTO {tableName} {cols} VALUE ({value}) ";
+            string sql = $"INSERT INTO {tableName} {cols} VALUES ({value}) ";
             SqlParameter[] sqlParameters = GetSqlParameters(paramsDic);
             return ExecuteCommand(sql, sqlParameters);
         }
@@ -54,8 +54,8 @@ namespace DataBaseHelper
                 values.Add($"({value})");
                 sqlParameters.AddRange(GetSqlParameters(paramsDic, i.ToString()));
             }
-            string cols = $"({string.Join(", ", GetModelDic(models[0]).Select(m => m.Key))})";
-            string sql = $"INSERT INTO {tableName} {cols} VALUE {string.Join(", ", values)} ";
+            string cols = string.Join(", ", GetModelDic(models[0]).Select(m => m.Key));
+            string sql = $"INSERT INTO {tableName} ({cols}) VALUES {string.Join(", ", values)} ";
 
             return ExecuteCommand(sql, sqlParameters.ToArray());
         }
