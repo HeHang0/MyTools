@@ -1,4 +1,5 @@
-﻿using StringHelper;
+﻿using FileHelper;
+using StringHelper;
 using System;
 
 namespace Test
@@ -7,9 +8,9 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            string a = "abcsklajdlkabcaskjaklabc";
-            var b = RegexHelper.MatchesGroups(a, "a(b)(c)");
-            Console.WriteLine(b);
+            var a = new ExcelImportHelper("C:\\Users\\hehan\\Desktop\\水表项目信息导入模板.xlsx");
+            a.Excute();
+            Console.WriteLine();
             Console.Read();
         }
     }

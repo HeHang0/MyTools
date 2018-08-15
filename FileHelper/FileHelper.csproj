@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="DownLoadFile.cs" />
     <Compile Include="ExcelExportHelper.cs" />
+    <Compile Include="ExcelImportHelper.cs" />
     <Compile Include="LogHelper.cs" />
     <Compile Include="MP3InfoHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

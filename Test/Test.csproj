@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FileHelper\FileHelper.csproj">
+      <Project>{eb08b965-4b8e-46b7-8a7b-41248e9eeedb}</Project>
+      <Name>FileHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HttpHelper\HttpHelper.csproj">
       <Project>{790e03d0-b942-4faa-9b2d-e26c64d6a4e7}</Project>
       <Name>HttpHelper</Name>
