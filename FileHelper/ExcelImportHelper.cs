@@ -30,11 +30,7 @@ namespace FileHelper
                 ExcelWorksheets workSheet = package.Workbook.Worksheets;
                 var a = workSheet.FirstOrDefault();
                 var array = a.Cells.Value as object[,];
-                //Dictionary<string, object> dic = new Dictionary<string, object>();
-                //for (int j = 0; j < array.GetLength(1); j++)
-                //{
-                //    dic.Add(array[0, j].ToString(), null);
-                //}
+                
                 for (int i = 0; i < array.GetLength(0); i++)
                 {
                     Dictionary<int, object> dic = new Dictionary<int, object>();
@@ -67,5 +63,32 @@ namespace FileHelper
         {
             excelStream?.Close();
         }
+    }
+
+    class ExcelRow
+    {
+        ExcelRow(object[,] values, bool isFirstRowAsIndex = false)
+        {
+            if (isFirstRowAsIndex)
+            {
+                Dictionary<string, int> dic = new Dictionary<string, int>();
+                for (int j = 0; j < values.GetLength(1); j++)
+                {
+                    string index = values[0, j].ToString();
+                    if (!dic.ContainsKey(index))
+                    {
+                        dic.Add(values[0, j].ToString(), j);
+                    }
+                }
+                rowIndex = dic;
+
+            }
+        }
+        public object this[int groupnum] => collection[groupnum];
+        public object this[string groupname] => collection[rowIndex[groupname]];
+
+        private object[] collection;
+
+        private readonly Dictionary<string, int> rowIndex;
     }
 }
