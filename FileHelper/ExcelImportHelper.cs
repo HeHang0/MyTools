@@ -21,25 +21,60 @@ namespace FileHelper
             excelStream = stream ?? throw new ArgumentException("Stream不可为空！");
         }
 
-        public List<Dictionary<int, object>> Excute()
+        public List<ExcelRow> Excute(bool isFirstRowAsIndex = false)
         {
-            List<Dictionary<int, object>> list = new List<Dictionary<int, object>>();
             using (excelStream)
             using (ExcelPackage package = new ExcelPackage(excelStream))
             {
                 ExcelWorksheets workSheet = package.Workbook.Worksheets;
                 var a = workSheet.FirstOrDefault();
                 var array = a.Cells.Value as object[,];
-                
-                for (int i = 0; i < array.GetLength(0); i++)
+                if (isFirstRowAsIndex)
                 {
-                    Dictionary<int, object> dic = new Dictionary<int, object>();
-                    for (int j = 0; j < array.GetLength(1); j++)
-                    {
-                        dic.Add(j, array[i, j]);
-                    }
-                    list.Add(dic);
+                    return GetExcelRowCollectionWithRowIndex(array);
                 }
+                else
+                {
+                    return GetExcelRowCollectionWith(array);
+                }
+                
+            }
+        }
+        private List<ExcelRow> GetExcelRowCollectionWith(object[,] values)
+        {
+            List<ExcelRow> list = new List<ExcelRow>();
+            for (int i = 0; i < values.GetLength(0); i++)
+            {
+                List<object> ol = new List<object>();
+                for (int j = 0; j < values.GetLength(1); j++)
+                {
+                    ol.Add(values[i, j]);
+                }
+                list.Add(new ExcelRow(ol.ToArray()));
+            }
+            return list;
+        }
+
+        private List<ExcelRow> GetExcelRowCollectionWithRowIndex(object[,] values)
+        {
+            Dictionary<string,int> rowIndexList = new Dictionary<string, int>();
+            for (int i = 0; i < values.GetLength(1); i++)
+            {
+                string value = values[0, i].ToString();
+                if (!rowIndexList.ContainsKey(value))
+                {
+                    rowIndexList.Add(value, i);
+                }
+            }
+            List<ExcelRow> list = new List<ExcelRow>();
+            for (int i = 1; i < values.GetLength(0); i++)
+            {
+                Dictionary<string, object> soDic = new Dictionary<string, object>();
+                foreach (var item in rowIndexList)
+                {
+                    soDic.Add(item.Key, values[i, item.Value]);
+                }
+                list.Add(new ExcelRow(soDic));
             }
             return list;
         }
@@ -65,27 +100,42 @@ namespace FileHelper
         }
     }
 
-    class ExcelRow
+    public class ExcelRow
     {
-        ExcelRow(object[,] values, bool isFirstRowAsIndex = false)
+        public ExcelRow(object[] values)
         {
-            if (isFirstRowAsIndex)
-            {
-                Dictionary<string, int> dic = new Dictionary<string, int>();
-                for (int j = 0; j < values.GetLength(1); j++)
-                {
-                    string index = values[0, j].ToString();
-                    if (!dic.ContainsKey(index))
-                    {
-                        dic.Add(values[0, j].ToString(), j);
-                    }
-                }
-                rowIndex = dic;
+            collection = values;
+        }
 
+        public ExcelRow(Dictionary<string, object> values)
+        {
+            collection = new object[values.Count];
+            rowIndex = new Dictionary<string, int>();
+            int i = 0;
+            foreach (var item in values)
+            {
+                collection[i] = item.Value;
+                rowIndex.Add(item.Key, i++);
             }
         }
+
+        public int Count => collection?.Length ?? 0;
+
         public object this[int groupnum] => collection[groupnum];
-        public object this[string groupname] => collection[rowIndex[groupname]];
+        public object this[string groupname]
+        {
+            get
+            {
+                if (collection != null && rowIndex != null && rowIndex.ContainsKey(groupname))
+                {
+                    return collection[rowIndex[groupname]];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         private object[] collection;
 
