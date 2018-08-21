@@ -12,6 +12,7 @@ namespace SocketServer
         public event ReceiveMessageHandler OnReceiveMessage;
         TcpListener listener;
         int port;
+        List<ReadWriteObject> rwoList = new List<ReadWriteObject>();
 
         public Server(int port)
         {
@@ -46,9 +47,22 @@ namespace SocketServer
             TcpListener myListener = ar.AsyncState as TcpListener;
             TcpClient client = myListener.EndAcceptTcpClient(ar);
             ReadWriteObject readWriteObject = new ReadWriteObject(client);
-
-            ///开始等待读入数据
+            rwoList.Add(readWriteObject);
             readWriteObject.BeginRead(ReadCallback);
+        }
+
+        public void SendData(byte[] sendBytes)
+        {
+            foreach (var item in rwoList)
+            {
+                item.BeginWrite(SendCallback, sendBytes);
+            }
+        }
+
+        private void SendCallback(IAsyncResult ar)
+        {
+            ReadWriteObject readWriteObject = ar.AsyncState as ReadWriteObject;
+            readWriteObject?.EndWrite(ar);
         }
 
         private void ReadCallback(IAsyncResult ar)
@@ -78,6 +92,7 @@ namespace SocketServer
             catch (Exception e)
             {
                 OnReceiveMessage?.Invoke("ServerError", e.Message);
+                if (readWriteObject != null) rwoList.Remove(readWriteObject);
             }
 
             if (readWriteObject != null)
@@ -89,6 +104,7 @@ namespace SocketServer
                 catch (Exception e)
                 {
                     OnReceiveMessage?.Invoke("ServerError", e.Message);
+                    if (readWriteObject != null) rwoList.Remove(readWriteObject);
                 }
 
             }
@@ -106,13 +122,12 @@ namespace SocketServer
             TcpClient client;
             NetworkStream netStream;
             public byte[] ReadBytes { get; private set; }
-            byte[] writeBytes;
 
             public ReadWriteObject(TcpClient client)
             {
                 this.client = client;
                 netStream = client.GetStream();
-                writeBytes = new byte[client.SendBufferSize];
+                //writeBytes = new byte[client.SendBufferSize];
             }
 
             public string RemoteEndPoint => client?.Client.RemoteEndPoint.ToString() ?? "";
@@ -133,10 +148,27 @@ namespace SocketServer
                 return netStream.EndRead(ar);
             }
 
+            public void BeginWrite(AsyncCallback readCallback, byte[] writeBytes)
+            {
+                if (client == null)
+                {
+                    return;
+                }
+                //writeBytes = new byte[client.SendBufferSize];
+                netStream.BeginWrite(writeBytes,
+                    0, writeBytes.Length, readCallback, this);
+                netStream.Flush();
+            }
+
+            public void EndWrite(IAsyncResult ar)
+            {
+                netStream.EndWrite(ar);
+            }
+
             public void Close()
             {
-                client.Close();
                 netStream.Close();
+                client.Close();
             }
         }
     }
