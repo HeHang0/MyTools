@@ -21,14 +21,15 @@ namespace FileHelper
             excelStream = stream ?? throw new ArgumentException("Stream不可为空！");
         }
 
+
         public List<ExcelRow> Excute(bool isFirstRowAsIndex = false)
         {
             using (excelStream)
             using (ExcelPackage package = new ExcelPackage(excelStream))
             {
-                ExcelWorksheets workSheet = package.Workbook.Worksheets;
-                var a = workSheet.FirstOrDefault();
-                var array = a.Cells.Value as object[,];
+                ExcelWorksheets workSheets = package.Workbook.Worksheets;
+                ExcelWorksheet workSheet = workSheets.FirstOrDefault();
+                var array = workSheet?.Cells?.Value as object[,] ?? new object[0,0];
                 if (isFirstRowAsIndex)
                 {
                     return GetExcelRowCollectionWithRowIndex(array);
@@ -40,6 +41,7 @@ namespace FileHelper
                 
             }
         }
+
         private List<ExcelRow> GetExcelRowCollectionWith(object[,] values)
         {
             List<ExcelRow> list = new List<ExcelRow>();
@@ -100,35 +102,41 @@ namespace FileHelper
         }
     }
 
+
     public class ExcelRow
     {
         public ExcelRow(object[] values)
         {
-            collection = values;
+            cells = values;
         }
 
         public ExcelRow(Dictionary<string, object> values)
         {
-            collection = new object[values.Count];
+            cells = new object[values.Count];
             rowIndex = new Dictionary<string, int>();
             int i = 0;
             foreach (var item in values)
             {
-                collection[i] = item.Value;
+                cells[i] = item.Value;
                 rowIndex.Add(item.Key, i++);
             }
         }
 
-        public int Count => collection?.Length ?? 0;
+        public int Count => cells?.Length ?? 0;
 
-        public object this[int groupnum] => collection[groupnum];
+        /// <summary>
+        /// 使用下标或字符串索引查找单元格
+        /// </summary>
+        /// <param name="groupnum"></param>
+        /// <returns></returns>
+        public object this[int groupnum] => cells[groupnum];
         public object this[string groupname]
         {
             get
             {
-                if (collection != null && rowIndex != null && rowIndex.ContainsKey(groupname))
+                if (cells != null && rowIndex != null && rowIndex.ContainsKey(groupname))
                 {
-                    return collection[rowIndex[groupname]];
+                    return cells[rowIndex[groupname]];
                 }
                 else
                 {
@@ -137,7 +145,7 @@ namespace FileHelper
             }
         }
 
-        private object[] collection;
+        private object[] cells;
 
         private readonly Dictionary<string, int> rowIndex;
     }
