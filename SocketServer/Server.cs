@@ -16,24 +16,27 @@ namespace SocketServer
 
         public Server(int port)
         {
+            if (port < 0 || port > 65535)
+            {
+                throw new ArgumentException("端口号格式错误。。。");
+            }
             this.port = port;
         }
 
-        public bool StartServer()
+        public Server StartServer()
         {
             try
             {
                 listener = new TcpListener(IPAddress.Any, port);
                 listener.Start();
                 AcceptConnect();
-                OnReceiveMessage?.Invoke("ServerSuccess", listener.Server.AddressFamily.ToString());
+                OnReceiveMessage?.Invoke("ServerSuccess", listener.Server.LocalEndPoint.ToString());
             }
             catch (Exception e)
             {
                 OnReceiveMessage?.Invoke("ServerError", e.Message);
-                return false;
             }
-            return true;
+            return this;
         }
 
         private void AcceptConnect()
@@ -46,9 +49,17 @@ namespace SocketServer
         {
             TcpListener myListener = ar.AsyncState as TcpListener;
             TcpClient client = myListener.EndAcceptTcpClient(ar);
+            OnReceiveMessage?.Invoke("Server", $"Connected {client.Client.RemoteEndPoint.ToString()}");
             ReadWriteObject readWriteObject = new ReadWriteObject(client);
             rwoList.Add(readWriteObject);
             readWriteObject.BeginRead(ReadCallback);
+            AcceptConnect();
+        }
+
+        public void SendData(string message)
+        {
+            byte[] sendBytes = Encoding.UTF8.GetBytes(message);
+            SendData(sendBytes);
         }
 
         public void SendData(byte[] sendBytes)
@@ -114,6 +125,7 @@ namespace SocketServer
         {
             byte[] b = new byte[count];
             Array.Copy(rwObj.ReadBytes, 0, b, 0, count);
+            SendData(b);
             OnReceiveMessage?.Invoke(rwObj.RemoteEndPoint, Encoding.UTF8.GetString(b));
         }
 
