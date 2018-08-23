@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -184,6 +186,52 @@ namespace SocketServer
             }
         }
     }
+    class Message : IMessage<Message>
+    {
+        public string Name { get; set; }
+        public string Content { get; set; }
+        public static MessageParser<Message> Parser => new MessageParser<Message>(() => new Message());
 
+        public MessageDescriptor Descriptor => throw new NotImplementedException();
 
+        public void MergeFrom(Message message)
+        {
+            Name = message.Name;
+            Content = message.Content;
+        }
+
+        public void MergeFrom(CodedInputStream input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteTo(CodedOutputStream output)
+        {
+            if (Name.Length != 0)
+            {
+                output.WriteRawTag(10);
+                output.WriteString(Name);
+            }
+            if (Content.Length != 0)
+            {
+                output.WriteRawTag(2000006);
+                output.WriteString(Content);
+            }
+        }
+
+        public int CalculateSize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Equals(Message other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Message Clone()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
