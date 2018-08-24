@@ -6,6 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/**
+ *          List<ExcelRow> excel = new ExcelImportHelper("*.xlsx").Excute();
+ *          foreach (var item in a)
+ *          {
+ *              for (int i = 0; i < item.Count; i++)
+ *              {
+ *                  Console.Write(item[i] + "\t");
+ *              }
+ *          }
+ */
+
 namespace FileHelper
 {
     public class ExcelImportHelper

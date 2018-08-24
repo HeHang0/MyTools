@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using Google.Protobuf;
 
 namespace SocketClient
 {
     public class Client
     {
-        public delegate void ReceiveMessageHandler(string name, string message);
+        public delegate void ReceiveMessageHandler(Message message);
         public event ReceiveMessageHandler OnReceiveMessage;
         IPEndPoint serverIp;
         Socket tcpClient;
@@ -39,7 +39,7 @@ namespace SocketClient
             tcpClient.BeginConnect(serverIp, asyncResult =>
             {
                 tcpClient.EndConnect(asyncResult);
-                OnReceiveMessage?.Invoke("Client", $"Connected {serverIp.ToString()}");
+                OnReceiveMessage?.Invoke(new Message() { Name= "Client", Content=$"Connected {serverIp.ToString()}" });
                 AsynRecive();
             }, null);
             return this;
@@ -59,7 +59,8 @@ namespace SocketClient
                 int length = tcpClient.EndReceive(asyncResult);
                 if (length > 0)
                 {
-                    OnReceiveMessage?.Invoke("Server", Encoding.UTF8.GetString(data, 0, length));
+                    Message message = Message.Parser.ParseFrom(data, 0, length);
+                    OnReceiveMessage?.Invoke(message);
                 }                
                 AsynRecive();
             }, null);
@@ -75,12 +76,23 @@ namespace SocketClient
         /// <param name="message">发送消息</param>
         public void AsynSend(string message)
         {
-            byte[] data = Encoding.UTF8.GetBytes(message);
-            tcpClient.BeginSend(data, 0, data.Length, SocketFlags.None, asyncResult =>
+            Message m = new Message
+            {
+                Name = tcpClient.LocalEndPoint.ToString(),
+                Content = message
+            };
+            byte[] sendBytes;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                // Save the person to a stream
+                m.WriteTo(stream);
+                sendBytes = stream.ToArray();
+            }
+            tcpClient.BeginSend(sendBytes, 0, sendBytes.Length, SocketFlags.None, asyncResult =>
             {
                 //完成发送消息
                 int length = tcpClient.EndSend(asyncResult);
-                OnReceiveMessage?.Invoke("Client", message);
+                OnReceiveMessage?.Invoke(new Message() { Name = "Client", Content = message });
             }, null);
         }
         #endregion

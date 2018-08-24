@@ -90,5 +90,27 @@ namespace HttpHelper
             await task;
             return result;
         }
+
+        /// <summary>
+        /// 开始一个HTTP请求，并以回调函数接收结果
+        /// </summary>
+        /// <param name="url">要访问的URL</param>
+        /// <param name="method">请求的方法</param>
+        /// <param name="paramData">请求的参数</param>
+        /// <param name="referer">Referer</param>
+        /// <param name="userAgent">UserAgent</param>
+        /// <param name="contentType">ContentType</param>
+        /// <returns></returns>
+        public static async Task<string> StartHttpResponse(string url, Action<string> callback, string method = "GET", string paramData = "", string referer = "", string userAgent = "", string contentType = "")
+        {
+            string result = "";
+            Task task = Task.Run(() =>
+            {
+                result = GetHttpResponse(url, method, paramData, referer, userAgent, contentType);
+            });
+            await task;
+            callback(result);
+            return result;
+        }
     }
 }

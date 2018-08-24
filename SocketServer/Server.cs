@@ -1,7 +1,7 @@
 ﻿using Google.Protobuf;
-using Google.Protobuf.Reflection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -10,7 +10,7 @@ namespace SocketServer
 {
     public class Server
     {
-        public delegate void ReceiveMessageHandler(string name, string message);
+        public delegate void ReceiveMessageHandler(Message message);
         public event ReceiveMessageHandler OnReceiveMessage;
         TcpListener listener;
         int port;
@@ -32,11 +32,11 @@ namespace SocketServer
                 listener = new TcpListener(IPAddress.Any, port);
                 listener.Start();
                 AcceptConnect();
-                OnReceiveMessage?.Invoke("ServerSuccess", listener.Server.LocalEndPoint.ToString());
+                OnReceiveMessage?.Invoke(new Message() { Name="ServerSuccess", Content= listener.Server.LocalEndPoint.ToString()});
             }
             catch (Exception e)
-            {
-                OnReceiveMessage?.Invoke("ServerError", e.Message);
+            {                
+                OnReceiveMessage?.Invoke(new Message() { Name = "ServerError", Content = e.Message });
             }
             return this;
         }
@@ -51,7 +51,7 @@ namespace SocketServer
         {
             TcpListener myListener = ar.AsyncState as TcpListener;
             TcpClient client = myListener.EndAcceptTcpClient(ar);
-            OnReceiveMessage?.Invoke("Server", $"Connected {client.Client.RemoteEndPoint.ToString()}");
+            OnReceiveMessage?.Invoke(new Message() { Name = "Server", Content = $"Connected {client.Client.RemoteEndPoint.ToString()}" });
             ReadWriteObject readWriteObject = new ReadWriteObject(client);
             rwoList.Add(readWriteObject);
             readWriteObject.BeginRead(ReadCallback);
@@ -60,11 +60,22 @@ namespace SocketServer
 
         public void SendData(string message)
         {
-            byte[] sendBytes = Encoding.UTF8.GetBytes(message);
+            Message m = new Message
+            {
+                Name = "Server",
+                Content = message
+            };
+            byte[] sendBytes;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                // Save the person to a stream
+                m.WriteTo(stream);
+                sendBytes = stream.ToArray();
+            }
             SendData(sendBytes);
         }
 
-        public void SendData(byte[] sendBytes)
+        private void SendData(byte[] sendBytes)
         {
             foreach (var item in rwoList)
             {
@@ -104,8 +115,17 @@ namespace SocketServer
             }
             catch (Exception e)
             {
-                OnReceiveMessage?.Invoke("ServerError", e.Message);
-                if (readWriteObject != null) rwoList.Remove(readWriteObject);
+                if (readWriteObject != null)
+                {
+                    OnReceiveMessage?.Invoke(new Message() { Name = "ServerError", Content = $"{readWriteObject.RemoteEndPoint}已离线" });
+                    rwoList.Remove(readWriteObject);
+                    readWriteObject.Close();
+                    readWriteObject = null;
+                }
+                else
+                {
+                    OnReceiveMessage?.Invoke(new Message() { Name = "ServerError", Content = e.Message });
+                }
             }
 
             if (readWriteObject != null)
@@ -116,8 +136,13 @@ namespace SocketServer
                 }
                 catch (Exception e)
                 {
-                    OnReceiveMessage?.Invoke("ServerError", e.Message);
-                    if (readWriteObject != null) rwoList.Remove(readWriteObject);
+                    OnReceiveMessage?.Invoke(new Message() { Name = "ServerError", Content = $"{readWriteObject.RemoteEndPoint}已离线" });
+                    if (readWriteObject != null)
+                    {
+                        rwoList.Remove(readWriteObject);
+                        readWriteObject.Close();
+                        readWriteObject = null;
+                    }
                 }
 
             }
@@ -127,8 +152,8 @@ namespace SocketServer
         {
             byte[] b = new byte[count];
             Array.Copy(rwObj.ReadBytes, 0, b, 0, count);
-            SendData(b);
-            OnReceiveMessage?.Invoke(rwObj.RemoteEndPoint, Encoding.UTF8.GetString(b));
+            SendData(b); 
+            OnReceiveMessage?.Invoke(Message.Parser.ParseFrom(b));
         }
 
         class ReadWriteObject
@@ -184,54 +209,6 @@ namespace SocketServer
                 netStream.Close();
                 client.Close();
             }
-        }
-    }
-    class Message : IMessage<Message>
-    {
-        public string Name { get; set; }
-        public string Content { get; set; }
-        public static MessageParser<Message> Parser => new MessageParser<Message>(() => new Message());
-
-        public MessageDescriptor Descriptor => throw new NotImplementedException();
-
-        public void MergeFrom(Message message)
-        {
-            Name = message.Name;
-            Content = message.Content;
-        }
-
-        public void MergeFrom(CodedInputStream input)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void WriteTo(CodedOutputStream output)
-        {
-            if (Name.Length != 0)
-            {
-                output.WriteRawTag(10);
-                output.WriteString(Name);
-            }
-            if (Content.Length != 0)
-            {
-                output.WriteRawTag(2000006);
-                output.WriteString(Content);
-            }
-        }
-
-        public int CalculateSize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Equals(Message other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Message Clone()
-        {
-            throw new NotImplementedException();
         }
     }
 }

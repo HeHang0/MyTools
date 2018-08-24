@@ -23,9 +23,9 @@ namespace SocketServer
             }
         }
 
-        private static void OnReceiveMessage(string name, string message)
+        private static void OnReceiveMessage(Message message)
         {
-            Console.WriteLine($"{name} : {message}");
+            Console.WriteLine($"{message.Name} : {message.Content}");
         }
     }
 }

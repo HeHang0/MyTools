@@ -8,6 +8,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ *          Dictionary<string, string> col = new Dictionary<string, string>() {
+ *              { "Col1","列1"}, { "Col2", "列2" },{ "Col3", "列3" }
+ *          };
+ *          byte[] fileContent = ExcelExportHelper.ExportExcel(result.OrderBy(m => m.SortOrder).ToList(), "", false, col);
+ *          using (FileStream fs = new FileStream("file.xlsx", FileMode.Create))
+ *          {
+ *              fs.Write(fileContent, 0, fileContent.Length);
+ *          } 
+ */
+
 namespace FileHelper
 {
     public class ExcelExportHelper
@@ -101,7 +112,7 @@ namespace FileHelper
         /// </summary>
         /// <param name="dataTable">数据源</param>
         /// <param name="heading">工作簿Worksheet</param>
-        /// <param name="showSrNo">//是否显示行编号</param>
+        /// <param name="showSrNo">是否显示行编号</param>
         /// <param name="columnsToTake">要导出的列</param>
         /// <returns></returns>
         private static byte[] ExportExcel(DataTable dataTable, string heading = "", bool showSrNo = false, Dictionary<string, string> columnsToTake = null)
@@ -230,18 +241,18 @@ namespace FileHelper
         /// 导出Excel
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="heading"></param>
-        /// <param name="isShowSlNo"></param>
-        /// <param name="ColumnsToTake"></param>
+        /// <param name="data">数据源</param>
+        /// <param name="heading">工作簿Worksheet</param>
+        /// <param name="showSrNo">是否显示行编号</param>
+        /// <param name="columnsToTake">要导出的列</param>
         /// <returns></returns>
-        public static byte[] ExportExcel<T>(List<T> data, string heading = "", bool isShowSlNo = false, Dictionary<string, string> ColumnsToTake = null)
+        public static byte[] ExportExcel<T>(List<T> data, string heading = "", bool isShowSlNo = false, Dictionary<string, string> columnsToTake = null)
         {
             if (data.Count <= 0)
             {
                 return new byte[] { new byte() };
             }
-            return ExportExcel(ListToDataTable<T>(data, ColumnsToTake), heading, isShowSlNo, ColumnsToTake);
+            return ExportExcel(ListToDataTable<T>(data, columnsToTake), heading, isShowSlNo, columnsToTake);
         }
 
         #endregion
