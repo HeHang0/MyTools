@@ -65,6 +65,10 @@
       <Project>{afe6dd70-4d6f-489c-9719-6365c996aa84}</Project>
       <Name>StringHelper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WindowsHelper\WindowsHelper.csproj">
+      <Project>{836B44FA-00AD-4D0E-9504-39D5D60495FB}</Project>
+      <Name>WindowsHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

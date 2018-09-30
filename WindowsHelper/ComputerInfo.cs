@@ -230,7 +230,7 @@ namespace WindowsHelper
         /// </summary>
         private string GetScreenResolution()
         {
-            string result = "xxxx*xxxx";
+            string result = "";
             try
             {
                 string hdId = string.Empty;
@@ -238,9 +238,8 @@ namespace WindowsHelper
                 ManagementObjectCollection mcC = mc.GetInstances();
                 foreach (ManagementObject m in mcC)
                 {
-                    result = m[WindowsAPIKeys.ScreenWidth.ToString()].ToString() + "*" +
-m[WindowsAPIKeys.ScreenHeight.ToString()].ToString();
-                    break;
+                    result += m[WindowsAPIKeys.ScreenWidth.ToString()]?.ToString() + "*" +
+m[WindowsAPIKeys.ScreenHeight.ToString()]?.ToString() + ";";
                 }
             }
             catch

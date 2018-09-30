@@ -96,5 +96,12 @@ namespace SocketClient
             }, null);
         }
         #endregion
+
+        public void Dispose()
+        {
+            tcpClient?.Close();
+            tcpClient?.Dispose();
+            tcpClient = null;
+        }
     }
 }
